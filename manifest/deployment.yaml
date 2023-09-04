@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudru-app
+  labels:
+    app: cloudru-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cloudru-app
+  template:
+    metadata:
+      labels:
+        app: cloudru-app
+    spec:
+      containers:
+      - name: cloudru-app
+        image: cloudru-task:1.0
+        ports:
+        - containerPort: 8000
+        env:
+        - name: UUID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudru-app-service
+spec:
+  selector:
+    app: cloudru-app
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

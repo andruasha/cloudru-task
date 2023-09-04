@@ -1,0 +1,30 @@
+---
+- name: Configure Ubuntu Server
+  hosts: 192.168.23.135
+  become: yes
+  tasks:
+    - name: Create user 'cloudru' with password 'cloudpass'
+      user:
+        name: cloudru
+        password: "{{ 'cloudpass' | password_hash('sha512') }}"
+      become_user: root
+
+    - name: Allow SSH key authentication for 'cloudru'
+      authorized_key:
+        user: cloudru
+        state: present
+        key: "{{ lookup('file', '/home/andrey/.ssh/id_rsa.pub') }}"
+      become_user: root
+
+    - name: Disable SSH root login
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: '^(PermitRootLogin|PasswordAuthentication)'
+        replace: '\1 no'
+      become_user: root
+
+    - name: Restart SSH service
+      service:
+        name: sshd
+        state: restarted
+      become_user: root
