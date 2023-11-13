@@ -1,4 +1,7 @@
 apiVersion: v2
+
 name: cloudru-app
+
 description: Helm chart for the cloudru-app
+
 version: 0.1.0
